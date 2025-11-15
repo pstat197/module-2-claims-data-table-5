@@ -7,19 +7,19 @@
 # Perform a secondary tokenization to obtain bigrams.
 # Fit a logistic principal component regression model to the word-tokenized TF–IDF data,
 # then use the predicted log-odds from that model plus some PCs of the bigram data as predictors in a second 
-# logistic regression model.
+  # logistic regression model.
 #Evaluate whether bigrams add predictive power.
 
 # So we need to build a two step stacked model. We would want to use the cleaned text. Create a word-level 
-# TF-IDF matrix i.e. the term frequency inverse document frequency as mentioned in class. The idea is 
-# Words that appear frequently in a single document but not frequently across all documents and get 
-# the highest score. each row is one document and each column is one token and each cell is the TFIDF 
-# score. This is already in the nlp_fn in one of the provided scripts. Then we perform PCA on the 
-# TFDIF matrix and fit a logistic regression and save the predicted log-odds. 
+  # TF-IDF matrix i.e. the term frequency inverse document frequency as mentioned in class. The idea is 
+  # Words that appear frequently in a single document but not frequently across all documents and get 
+  # the highest score. each row is one document and each column is one token and each cell is the TFIDF 
+  # score. This is already in the nlp_fn in one of the provided scripts. Then we perform PCA on the 
+  # TFDIF matrix and fit a logistic regression and save the predicted log-odds. 
 
 # Then we create bigram TFDIF using the `unnest_tokens(token="ngrams", n=2)` 
-# PCA on this and fit a second logistic regression and compare the metrics like auc, accuracy, deviance, 
-# BIC/AIC, and determine whether bigrams improve the performance or not. 
+  # PCA on this and fit a second logistic regression and compare the metrics like auc, accuracy, deviance, 
+  # BIC/AIC, and determine whether bigrams improve the performance or not. 
 
 ## this script contains functions for preprocessing
 ## claims data; intended to be sourced 
@@ -101,12 +101,12 @@ word_pc <- pca_words$x
 # we pick number of pcs, common choices are 50, 100 to capture at least 80% of the variance
 # We retained the first 100 principal components from the word TF–IDF PCA.
 # They explained approximately 80–90% of the variance and provided stable logistic regression fits 
-# without overfitting. this is the standard
+ # without overfitting. this is the standard
 
 # this step takes a long time to run almost 5-10 minutes. because prcomp() does a full SVD on a 
-# dense matrix – computational complexity is roughly O(min(np^2, pn^2)). 
-# We can fix it by using sparse PCA (irlba) instead of prcomp() but I have just left it like that for now
-# I changed it to use sparse, using the irlba library
+  # dense matrix – computational complexity is roughly O(min(np^2, pn^2)). 
+  # We can fix it by using sparse PCA (irlba) instead of prcomp() but I have just left it like that for now
+  # I changed it to use sparse, using the irlba library
 
 
 # Logistic regression 
@@ -119,12 +119,12 @@ modreg <- glm(bclass ~ ., data = log_reg_df_regular, family = binomial())
 logoddsreg <- predict(modreg, type = "link")
 summary(modreg)
 # For warning 1. The warning is completely expected because we have lots of predictors and the model is close 
-# to perfectly separable. Iteratively reweighted least squares (IRLS) gets unstable. We can still use 
-# predicted log odds. The purpose here is dimension reduction, not interpreting coefficients, 
-# so slight non-convergence is fine.
+  # to perfectly separable. Iteratively reweighted least squares (IRLS) gets unstable. We can still use 
+  # predicted log odds. The purpose here is dimension reduction, not interpreting coefficients, 
+  # so slight non-convergence is fine.
 
 # For warning 2: This happens all the time in stacked models and PCA logistic regression. Not a problem 
-# in our case.
+  # in our case.
 
 
 
@@ -152,36 +152,12 @@ nlp_bigrams <- function(parse_data.out){
 }
 
 # This takes a long time to run as well. Anywhere from 2-20 minutes. It's Tokenizing text into bigrams, counting
-# all the bigrams and building a matrix with thousands, even tens of thousands of bigram features.
+  # all the bigrams and building a matrix with thousands, even tens of thousands of bigram features.
 bigram_df <- nlp_bigrams(claims_clean)
-
-# Align datasets to ensure same observations in both
-common_ids <- intersect(word_df$.id, bigram_df$.id)
-
-word_df <- word_df %>% filter(.id %in% common_ids)
-bigram_df <- bigram_df %>% filter(.id %in% common_ids)
-
-cat("Number of observations after alignment:", nrow(word_df), "\n")
-
-# Refit word model on aligned data
-word_matrix <- word_df %>%
-  select(-.id, -bclass) %>%
-  as.matrix()
-
-pca_words <- prcomp_irlba(word_matrix, n = K, center = TRUE, scale. = TRUE)
-word_pc <- pca_words$x
-
-log_reg_df_regular <- data.frame(
-  bclass = as.factor(word_df$bclass),
-  word_pc
-)
-
-modreg <- glm(bclass ~ ., data = log_reg_df_regular, family = binomial())
-logoddsreg <- predict(modreg, type = "link")
 
 # Now we are working on PCA on bigram TFIDF
 M <- 50 # We want M to be less than K in the above logistic regression because 
-# the bigrams are less than tokens in total 
+        # the bigrams are less than tokens in total 
 bigram_matrix <- bigram_df %>% select(-.id, -bclass) %>% as.matrix()
 
 svd_bigram <- irlba(scale(bigram_matrix, center = TRUE, scale = TRUE), nv = M)
@@ -194,11 +170,11 @@ colnames(bigram_pcs) <- paste0("bigram_PC", 1:M)
 
 
 # Now this is the tricky part, fit a logistic principal component regression model to the word-tokenized data,
-# and then input the predicted log-odds-ratios together with some number of principal components of the 
-# bigram-tokenized data to a second logistic regression model.
+  # and then input the predicted log-odds-ratios together with some number of principal components of the 
+  # bigram-tokenized data to a second logistic regression model.
 # What this means is that once we fit the logistic regression using the regular word PCA and then we combine
-# the predicted log odds and the bigram PCs into one dataset and fit a second logistic regression model. This 
-# is because we want to check whether the bigrams are ADDING anything to the original metric. 
+  # the predicted log odds and the bigram PCs into one dataset and fit a second logistic regression model. This 
+  # is because we want to check whether the bigrams are ADDING anything to the original metric. 
 
 # Put bigram PCs into a dataframe with ID so we can merge correctly
 bigram_pc_df <- data.frame(
@@ -216,7 +192,7 @@ combined_df <- word_df %>%
   mutate(logodds_word = logoddsreg)
 
 log_reg_bigram <- glm(bclass ~ ., data = combined_df %>% select(-.id),
-                      family = binomial())
+            family = binomial())
 
 summary(log_reg_bigram)
 
@@ -269,10 +245,10 @@ cm2
 AIC(modreg)
 BIC(modreg)
 
-AIC(log_reg_bigram)
-BIC(log_reg_bigram)
+AIC(mod2)
+BIC(mod2)
 
 
 # Log likelihood
 logLik(modreg)
-logLik(log_reg_bigram)
+logLik(mod2)

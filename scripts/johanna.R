@@ -1,7 +1,5 @@
 ## PSTAT 197A – Module 2, Preliminary Task 3
 
-setwd("C:/Users/johan/OneDrive/Documents/PSTAT 197/module-2-claims-data-table-5")
-
 library(tidyverse)
 library(tidytext)
 library(rsample)

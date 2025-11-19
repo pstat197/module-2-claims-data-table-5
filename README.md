@@ -1,3 +1,4 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/I0qOjBA-)
 # module2-claims
 
 This is a template repository for the module 2 group assignment for PSTAT197A. The assignment objective is to develop a predictive model for webpage classification based on scraping text content.
@@ -63,5 +64,8 @@ If this were a technical project, you might be expected to provide a *brief* exe
 -   ***Deliverable 3:*** a set of multiclass and binary predictions on the test data, stored as `results/preds-group[N].RData` .
 
 -   ***Deliverable 4:*** deployable copies of your fitted predictive models, stored in the `results` directory, with a short script illustrating their use to generate predictions on the test data, stored in the `scripts` directory.
+
+### NOTE:
+Adarsh Nagar had issues with keras and tensorflow in R. His code contributions were forwarded to another member to collaborate in the completion of Preliminary Task 3 and otherwise Deliverable 2.
 
 *Your written summaries should be **very** high-level with a minimum of technical detail. The audience for your writeups is a project mentor or supervisor: assume the reader is familiar with the project and has a working knowledge of the methods you've used. The aim of each summary is to convey the task(s) and result(s) as simply as possible in a linear fashion: task 1, result 1; task 2, result 2; and so on. Note that your results for each task are simply a predictive accuracy (one or a few numbers) and a comment on the accuracy (generally, comparison with another result).*

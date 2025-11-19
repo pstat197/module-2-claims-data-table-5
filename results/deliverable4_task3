@@ -1,0 +1,39 @@
+library(tidyverse)
+library(keras3)
+
+model <- load_model("results/nn_task3_binary.keras")
+
+load("data/claims-clean-example.RData")   
+
+clean <- claims_clean %>%
+  filter(
+    !is.na(bclass),
+    !is.na(text_clean),
+    str_trim(text_clean) != ""
+  ) %>%
+  mutate(
+    bclass = factor(bclass),
+    text_clean = str_trim(text_clean)
+  )
+
+b_levels <- levels(clean$bclass)
+positive_class <- b_levels[2]
+
+predict_nn_task3 <- function(new_data, model, b_levels) {
+  prob <- predict(model, new_data$text_clean) |>
+    as.vector()
+  pred_class <- ifelse(prob > 0.5, b_levels[2], b_levels[1]) |>
+    factor(levels = b_levels)
+  tibble(
+    .id         = new_data$.id,
+    bclass.pred = pred_class
+  )
+}
+
+example_pages <- clean %>%
+  slice(1:20) %>%
+  select(.id, text_clean)
+
+example_preds <- predict_nn_task3(example_pages, model, b_levels)
+
+print(example_preds)

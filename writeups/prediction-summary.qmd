@@ -1,37 +1,68 @@
 ---
 title: "Predictive modeling of claims status"
-author: 'YOUR NAMES HERE'
+author: 'Aiden Frazier, Aarti Garaye, Johanna Jensen, Adarsh Nagar, Aakash Sriram'
 date: today
 ---
 
 ### Abstract
 
-Provide a 3-5 sentence summary of your work on the primary task. Indicate what input data was used, what method was used for binary class predictions, what method was used for multiclass predictions, and what estimated accuracies were achieved.
-
-> *Header and paragraph content was scraped from the raw webpages and processed into term frequencies of word tokens. For binary classification, a two-layer neural network yielded an estimated 81.4% accuracy; for multiclass classification, a support vector machine gave 78% accuracy.*
+The primary taks used HTML claim records that were cleaned into plain-text fields and transformed using TF-IDF text vectorization. Binary Prediction of bclass was trained using a 64-unit ReLU hidden layer and intertwined dropouts, achieving an accuracy of 0.7938. Multiclass predictions of mclass used a similar architecture but relied on a 128-unit ReLU layer and softmax output, achieving an accuracy of 0.6896. The results indicate the strongest performance in the binary task while the multiclass task performs strongly under greateer complexity
 
 ### Preprocessing
 
-In one paragraph lay out your preprocessing pipeline. No need to provide exact step-by-step detail; just give an overview of the main components:
-
--   what text content was extracted from HTML
-
--   how text was cleaned
-
--   how cleaned text was represented quantitatively
+The HTML documents were parsed with the intent of extracting meaningful content including both paragraph text and header tags(h1-h6). The cleaning process begins with removing URLs, emails, punctuation, digits, and stray apostrophes. This is followed by transforming text to lowercase and normalizing whitespace to maintain consistent, noise-reduction. Each document's text is then collapsed into a single processed string for downstream modeling where they're ultimately quantified in a TF-IDF-based text vectorization layer for machine learning.
 
 ### Methods
 
-Describe your final predictive models. Include one paragraph with details on the binary classification approach, and one on the multiclass approach. Include for each:
+#### Binary Model
 
--   what ML/statistical method was used
+This model is a neural network with TF-IDF vectorization, utilizing
+Keras layer-text-vectorization to normalize data through punctuation stripping and tokenize whitespace with a vocabulary size of 10,000 tokens. The TF–IDF features then pass through 5 heuristically-selected hyperparameter layers, including a 64-unit ReLU dense layer followed by dropout, before reaching a final sigmoid output node that returns the probability predictions for the positive class. Training  was performed using the Adam optimizer with a batch size of 32 and 8 epochs, using binary-cross-entropy loss, an 80/20 stratified test split, and a 20% validation split applied within the Keras fit() function. 
 
--   model specification and hyperparameter selection
+#### Multiclass Model 
 
--   training method
+This model incorporates the exact same cleaning and TF-IDF approach with a 12,000 token vocabulary size to account for multiple class predictions. Then, the model processes through 5 heuristically-selected hyperparameter layers, including a 128-unit ReLU dense layer followed by dropout for regularization, and outputs class probabilities through a five-class softmax layer. Training  was performed using the Adam optimizer with a batch size of 32 and 10 epochs, using categorical-cross-entropy loss, an 80/20 stratified test split, and a 20% validation split. 
 
 ### Results
+As expected, Binary accuracy trumps multiclass by roughly 10%, yielding two trained models that effectively outperform preceding extended in-class analyses in predictive accuracy.
+```{r,echo=FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(kableExtra))
 
-Indicate the predictive accuracy of the binary classifications and the multiclass classifications. Provide a table for each, and report sensitivity, specificity, and accuracy.[^1]
+binary_table <- tibble(
+  Metric = c("Accuracy", "Sensitivity", "Specificity"),
+  Estimate = c(0.775, 0.838, 0.719)
+)
 
-[^1]: Read [this article](https://yardstick.tidymodels.org/articles/multiclass.html) on multiclass averaging.
+binary_table %>%
+  kable(
+    caption = "Binary Model Performance Metrics"
+  )
+
+multi_table <- tibble(
+  Metric = c("Accuracy", "Sensitivity", "Specificity"),
+  Estimate = c(0.469, 0.2, 0.8)
+)
+
+multi_table %>%
+  kable(
+    caption = "Multiclass Model Performance Metrics"
+  )
+
+accuracy_summary <- tibble(
+  Model = c("Binary Classification", "Multiclass Classification"),
+  Accuracy = c(0.7938, 0.6896)
+)
+
+accuracy_summary %>%
+  kable(
+    caption = "Overall NN-Trained Accuracy Comparison"
+  )
+```
+
+
+
+
+
+

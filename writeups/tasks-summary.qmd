@@ -1,25 +1,17 @@
 ---
 title: "Summary of exploratory tasks"
-author: 'YOUR NAMES HERE'
+author: 'Aiden Frazier, Aarti Garaye, Johanna Jensen, Adarsh Nagar, Aakash Sriram'
 date: today
 ---
 
 ### HTML scraping
 
-Does including header content improve predictions? Answer the question and provide quantitative evidence supporting your answer.
+We compared two text-extraction strategies: using only paragraph text versus using both headers and paragraphs. Both were cleaned the same way and converted to tf-idf matrices. Now each matrix we processed using PCA, and then we trained a logistic regression model on the principal component scores. Then an evaluation was done on the binary accuracy on test sets which we held out from the split for both scraping strategies. PCA reduced dimensionality substantially: the first 50 components explained about 82% of the variance in the paragraph-only tf-idf matrix, compared to 78% for the headers-plus-paragraphs version. The lower variance capture suggests the header-augmented matrix was structurally noisier. After fitting logistic principal component regression models to each version of the cleaned data, the paragraph-only model achieved an accuracy of 0.54, while the headers-plus-paragraphs model reached only 0.47. This indicates that adding header content did not improve predictive performance and in this dataset slightly reduced accuracy. The likely explanation is that headers in this dataset may not consistently contain useful or distinct signals, and in some cases may introduce additional noise. Overall, quantitative evidence from multiple metrics indicates that headers did not provide additional predictive structure and, for this dataset, degraded the performance of a PCA–logistic regression pipeline.
 
 ### Bigrams
 
-Do bigrams capture additional information relevant to the classification of interest? Answer the question, **briefly** describe what analysis you conducted to arrive at your answer, and provide quantitative evidence supporting your answer.
+To assess whether bigrams provide additional information beyond single-word features, we built a two-stage stacked model. First, we created a TF–IDF matrix from word tokens, reduced it with PCA, and fit a logistic regression model to obtain predicted log-odds for each document. Next, we constructed a separate TF–IDF matrix using bigrams, reduced it with PCA, and combined the resulting bigram components with the word-model log-odds in a second logistic regression. The baseline word-only model performed poorly (AUC ≈ 0.55, accuracy ≈ 0.59), but after adding bigram features the performance increased substantially, reaching an AUC of about 0.86 and accuracy around 0.79.This is a very large gain in discrimination ability, indicating that the bigram representations capture important structure in the text that word-level features alone do not. The model comparison metrics reinforce this conclusion. The AIC and BIC of the bigram-augmented model are dramatically lower indicating a much better fit even after accounting for additional parameters. The likelihood-ratio test also overwhelmingly favors the bigram model (with a deviance reduction of ~55,800), showing that the improvement is statistically significant. These results show that bigrams capture meaningful contextual information that single-word features miss, and incorporating them leads to a large improvement in predictive accuracy. 
 
-### Neural net
+### Neural Network
 
-Summarize the neural network model you trained by desribing:
-
--   architecture
-
--   optimization and loss
-
--   training epochs
-
--   predictive accuracy
+To evaluate whether a neural network could extract more predictive signal from the claim-page text than our earlier PCA-based logistic regression, we trained a TF–IDF neural network model using the cleaned text from the training set. The model uses a sequential architecture with text preprocessing layer with a 10,000-token vocabulary and TF-IDF output, followed by a dense hidden layer with 64 ReLU units. Dropout regularization is applied at two stages (10% after preprocessing, 20% after the hidden layer) to prevent overfitting. The output layer contains a single unit with sigmoid activation for binary classification. The model was trained with the Adam optimizer and binary cross-entropy loss for 10 epochs (batch size 32) with a 20% validation split.The neural network achieved approximately 0.75 (75%) test accuracy on the claims classification task. This represents substantial improvement over the preliminary task 1 logistic PCA model, which achieved only 0.54 (54%) accuracy. The superior performance suggests that the neural network captures more useful signal from the text data than PCA-based dimensionality reduction, which loses predictive information through aggressive feature compression.

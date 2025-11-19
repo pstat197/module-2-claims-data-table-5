@@ -208,6 +208,12 @@ used_rows <- as.numeric(rownames(log_reg_bigram$model))
 
 # True labels for the rows actually used by the bigram model
 y2 <- as.numeric(combined_df$bclass[used_rows]) - 1
+y <- as.numeric(log_reg_df_regular$bclass[used_rows]) - 1
+
+# Model 1 predicted probabilities
+prob1_full <- predict(modreg, type = "response")
+prob1 <- prob1_full[used_rows]
+pred1_class <- ifelse(prob1 > 0.5, 1, 0)
 
 # Predictions for those same rows
 pred2_prob <- predict(log_reg_bigram, type = "response")
@@ -288,3 +294,16 @@ print(lr_test)
 # suggest that bigrams provide substantial additional information about the claim status of a page—they 
 # capture contextual or phrase-level patterns that single tokens cannot, and incorporating them leads to far
 # more accurate classification.
+
+save(pca_words, modreg, 
+     file = "results/model_word_pca_task2.RData")
+
+save(svd_bigram, 
+     file = "results/model_bigram_pca_task2.RData")
+
+save(log_reg_bigram, 
+     file = "results/model_stack_task2.RData")
+
+save(pred2_prob, pred2_class, 
+     file = "results/preds-group5_task2.RData")
+

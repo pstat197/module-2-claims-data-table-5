@@ -16,7 +16,6 @@ clean <- claims_clean %>%
     text_clean = str_trim(text_clean)
   )
 
-# Extract factor levels (for mapping predictions back to labels)
 b_levels <- levels(clean$bclass)
 positive_class <- b_levels[2]
 
@@ -30,8 +29,6 @@ predict_nn_task3 <- function(new_data, model, b_levels) {
     bclass.pred = pred_class
   )
 }
-
-
 
 example_pages <- clean %>%
   slice(1:20) %>%

@@ -14,7 +14,7 @@ save_model(
 
 example_pages <- c(
   "The claim is supported by multiple clinical trials and peer-reviewed studies.",
-  "This page is just a navigation menu with no claim-related content."
+  "This page is a menu with no claim-related content."
 )
 
 

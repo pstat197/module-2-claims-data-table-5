@@ -24,7 +24,7 @@ Keras layer-text-vectorization to normalize data through punctuation stripping a
 This model incorporates the exact same cleaning and TF-IDF approach with a 12,000 token vocabulary size to account for multiple class predictions. Then, the model processes through 5 heuristically-selected hyperparameter layers, including a 128-unit ReLU dense layer followed by dropout for regularization, and outputs class probabilities through a five-class softmax layer. Training  was performed using the Adam optimizer with a batch size of 32 and 10 epochs, using categorical-cross-entropy loss, an 80/20 stratified test split, and a 20% validation split. 
 
 ### Results
-
+As expected, Binary accuracy trumps multiclass by roughly 10%, yielding two trained models that effectively outperform preceding extended in-class analyses in predictive accuracy.
 ```{r,echo=FALSE}
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(knitr))

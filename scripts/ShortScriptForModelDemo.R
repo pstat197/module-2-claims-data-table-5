@@ -27,4 +27,28 @@ print(head(pred_stacked))
 
 # Task 3 Models and Predictions
 
+source("scripts/johanna.R")
+
+save_model(
+  model,
+  filepath = "results/nn_task3_binary.keras"
+)
+
+
+example_pages <- c(
+  "The claim is supported by multiple clinical trials and peer-reviewed studies.",
+  "This page is just a navigation menu with no claim-related content."
+)
+
+
+prob_new <- predict(model, example_pages) |> as.vector()
+pred_new <- ifelse(prob_new > 0.5, levels(train_set$bclass)[2],
+                   levels(train_set$bclass)[1])
+
+print(tibble(
+  text = example_pages,
+  prob_relevant = round(prob_new, 3),
+  predicted_bclass = pred_new
+))
+
 # Primary Task Model and Prediction

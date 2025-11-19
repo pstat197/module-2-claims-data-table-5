@@ -125,4 +125,8 @@ results <- tibble(
 cat("\nAccuracy comparison:\n")
 print(results)
 
-## The TF-IDF neural network achieved about 0.75 accuracy, which is substantially higher than the PCA logistic regression accuracy of 0.54. This suggests that the neural network can capture more useful signal from the text than PCA, which compresses the features too aggressively and loses predictive information.
+## The TF-IDF neural network achieved about 0.785 accuracy, which is substantially higher than the PCA logistic regression accuracy of 0.54. This suggests that the neural network can capture more useful signal from the text than PCA, which compresses the features too aggressively and loses predictive information.
+
+keras3::save_model(model, "results/nn_task3_binary.keras")
+
+cat("✅ Saved NN model to results/nn_task3_binary.keras\n")
